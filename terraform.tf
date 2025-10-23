@@ -1,9 +1,18 @@
-terraform{
-  required_version = ">= 1.3.7"
-
+terraform {
   required_providers {
     aws = {
-      source  = "registry.terraform.io/hashicorp/aws"
+      source  = "hashicorp/aws"
+      version = "~> 5.92"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.20"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.7"
     }
   }
+
+  required_version = ">= 1.2"
 }

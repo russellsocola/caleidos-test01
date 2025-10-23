@@ -2,3 +2,4 @@
 # --alias caleidos-eks --profile default
 
 # kubectl get nodes
+#kubectl get pods -n kube-system
