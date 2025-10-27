@@ -42,3 +42,42 @@ resource "helm_release" "alb_controller" {
 
   depends_on = [kubernetes_service_account.alb_controller]
 }
+
+resource "kubernetes_ingress_v1" "php_apache_ingress" {
+  metadata {
+    name      = "php-apache-ingress"
+    namespace = "default"
+    annotations = {
+      "kubernetes.io/ingress.class" = "alb"
+      "alb.ingress.kubernetes.io/scheme" = "internet-facing"
+      "alb.ingress.kubernetes.io/target-type" = "ip"
+      "alb.ingress.kubernetes.io/listen-ports" = "[{\"HTTP\":80}]"
+      "alb.ingress.kubernetes.io/healthcheck-path" = "/"
+    }
+  }
+
+  spec {
+    rule {
+      http {
+        path {
+          path = "/*"
+          path_type = "Prefix"
+
+          backend {
+            service {
+              name = kubernetes_service.php_apache.metadata[0].name
+              port {
+                number = 80
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  depends_on = [
+    helm_release.alb_controller,
+    kubernetes_service.php_apache
+  ]
+}
