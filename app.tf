@@ -66,32 +66,25 @@ resource "kubernetes_service" "php_apache" {
   }
 }
 
-# resource "kubernetes_horizontal_pod_autoscaler" "php_apache" {
-#   metadata {
-#     name = "php-apache"
-#   }
+resource "kubernetes_horizontal_pod_autoscaler" "php_apache" {
+  metadata {
+    name = "php-apache"
+  }
 
-#   spec {
-#     scale_target_ref {
-#       kind        = "Deployment"
-#       name        = kubernetes_deployment.php_apache.metadata[0].name
-#       api_version = "apps/v1"
-#     }
+  spec {
+    scale_target_ref {
+      kind        = "Deployment"
+      name        = kubernetes_deployment.php_apache.metadata[0].name
+      api_version = "apps/v1"
+    }
 
-#     min_replicas = 1
-#     max_replicas = 10
+    min_replicas = 1
+    max_replicas = 10
 
-#     metric {
-#       type = "Resource"
-
-#       resource {
-#         name = "cpu"
-
-#         target {
-#           type                = "Utilization"
-#           average_utilization = 40
-#         }
-#       }
-#     }
-#   }
-# }
+    target_cpu_utilization_percentage = 40
+  }
+  depends_on = [
+    kubernetes_deployment.php_apache,
+    helm_release.metrics-server
+  ]
+}
